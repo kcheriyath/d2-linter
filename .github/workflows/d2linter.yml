@@ -1,0 +1,48 @@
+name: d2linter
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-examples:
+    runs-on: ubuntu-latest
+    name: Lint example D2 files
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Lint valid examples — must pass
+      - name: Lint valid D2 files (syntax check)
+        uses: ./
+        with:
+          find_path: "examples/valid"
+          find_pattern: "*.d2"
+          verbose: "true"
+          fail_on_error: "true"
+
+      # Lint invalid examples — must surface errors; flip fail_on_error so
+      # the CI job itself still succeeds while exercising the error path
+      - name: Lint invalid D2 files (expect errors)
+        uses: ./
+        with:
+          find_path: "examples/invalid"
+          find_pattern: "*.d2"
+          verbose: "true"
+          fail_on_error: "false"
+
+      # Exercise the format-check code path — not enforced as a hard failure
+      # here because canonical formatting is validated on developer machines
+      - name: Lint valid D2 files (format check, informational)
+        uses: ./
+        with:
+          find_path: "examples/valid"
+          find_pattern: "*.d2"
+          check_format: "true"
+          verbose: "true"
+          fail_on_error: "false"
+

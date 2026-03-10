@@ -1,0 +1,39 @@
+name: "d2linter"
+description: "Lint your D2 declarative diagram files for syntax errors and optional formatting issues"
+author: "kcheriyath"
+
+inputs:
+  file_list:
+    description: "(optional) Space or comma-delimited list of D2 files to lint. When set, find_path and find_pattern are ignored. Useful with actions that output changed-file lists."
+    required: false
+  find_path:
+    description: "(optional) Directory to search for D2 files, relative to the project root. Defaults to . (repository root)."
+    required: false
+    default: "."
+  find_pattern:
+    description: "(optional) Filename pattern to search for. Defaults to *.d2"
+    required: false
+    default: "*.d2"
+  check_format:
+    description: "(optional) Set to true to also enforce D2 canonical formatting (d2 fmt --check). Defaults to false (syntax validation only)."
+    required: false
+    default: "false"
+  extra_params:
+    description: "(optional) Extra flags passed directly to the d2 fmt command."
+    required: false
+  verbose:
+    description: "(optional) Set to false to reduce log output to errors only. Defaults to true."
+    required: false
+    default: "true"
+  fail_on_error:
+    description: "(optional) Whether the action should fail when lint errors are found. Defaults to true."
+    required: false
+    default: "true"
+
+branding:
+  icon: "check-square"
+  color: "blue"
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
