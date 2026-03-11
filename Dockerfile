@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:12.5-slim
 
 ARG D2_VERSION=0.7.1
 
