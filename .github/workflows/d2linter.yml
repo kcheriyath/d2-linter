@@ -25,15 +25,25 @@ jobs:
           verbose: "true"
           fail_on_error: "true"
 
-      # Lint invalid examples — expect errors; fail_on_error=false so the
-      # CI job itself still passes while exercising all three error paths
+      # Lint invalid examples — expect errors; continue-on-error allows the job
+      # to proceed so we can assert the step actually failed below.
       - name: Lint invalid D2 files (expect errors)
+        id: lint-invalid
         uses: ./
+        continue-on-error: true
         with:
           find_path: "examples/invalid"
           find_pattern: "*.d2"
           verbose: "true"
-          fail_on_error: "false"
+          fail_on_error: "true"
+
+      # Assert the previous step reported failure — if the linter silently
+      # passed bad files this step will fail the job.
+      - name: Assert lint-invalid step failed
+        if: steps.lint-invalid.outcome != 'failure'
+        run: |
+          echo "Expected the lint-invalid step to fail, but it exited successfully." >&2
+          exit 1
 
       # Demonstrate selective opt-out: validate + render only (no format check)
       - name: Lint valid D2 files (validate + render only)
