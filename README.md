@@ -66,7 +66,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Get changed files
-        uses: masesgroup/retrieve-changed-files@v3
+        uses: masesgroup/retrieve-changed-files@491e80760c0e28d36ca6240a27b1ccb8e1402c13 # v3.0.0
         id: changed_files
 
       - name: d2linter

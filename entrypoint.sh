@@ -8,6 +8,11 @@ FILECOUNT=0
 LOOPCOUNT=0
 
 INPUT_EXTRA_PARAMS="${INPUT_EXTRA_PARAMS:-}"
+# Parse extra_params into an array once to prevent word-splitting and glob expansion
+EXTRA_PARAMS=()
+if [ -n "${INPUT_EXTRA_PARAMS}" ]; then
+  read -r -a EXTRA_PARAMS <<< "${INPUT_EXTRA_PARAMS}"
+fi
 INPUT_FIND_PATH="${INPUT_FIND_PATH:-.}"
 INPUT_FIND_PATTERN="${INPUT_FIND_PATTERN:-*.d2}"
 INPUT_FAIL_ON_ERROR="${INPUT_FAIL_ON_ERROR:-true}"
@@ -77,8 +82,7 @@ for FILE in "${FILELIST[@]}"; do
     if [ "${INPUT_VERBOSE}" = "true" ]; then
       echo "  -> format check (d2 fmt --check)" >&2
     fi
-    # shellcheck disable=SC2086
-    run_check "format" "${FILE}" /usr/local/bin/d2 fmt --check ${INPUT_EXTRA_PARAMS} "${FILE}"
+    run_check "format" "${FILE}" /usr/local/bin/d2 fmt --check "${EXTRA_PARAMS[@]}" "${FILE}"
   fi
 
   # 2. Syntax validation — d2 validate
@@ -86,8 +90,7 @@ for FILE in "${FILELIST[@]}"; do
     if [ "${INPUT_VERBOSE}" = "true" ]; then
       echo "  -> validate (d2 validate)" >&2
     fi
-    # shellcheck disable=SC2086
-    run_check "validate" "${FILE}" /usr/local/bin/d2 validate ${INPUT_EXTRA_PARAMS} "${FILE}"
+    run_check "validate" "${FILE}" /usr/local/bin/d2 validate "${EXTRA_PARAMS[@]}" "${FILE}"
   fi
 
   # 3. Render check — d2 <file> /dev/null (ensures the diagram renders)
@@ -95,8 +98,7 @@ for FILE in "${FILELIST[@]}"; do
     if [ "${INPUT_VERBOSE}" = "true" ]; then
       echo "  -> render check (d2 <file> /dev/null)" >&2
     fi
-    # shellcheck disable=SC2086
-    run_check "render" "${FILE}" /usr/local/bin/d2 ${INPUT_EXTRA_PARAMS} "${FILE}" /dev/null
+    run_check "render" "${FILE}" /usr/local/bin/d2 "${EXTRA_PARAMS[@]}" "${FILE}" /dev/null
   fi
 done
 
