@@ -1,0 +1,57 @@
+name: d2linter
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-examples:
+    runs-on: ubuntu-latest
+    name: Lint example D2 files
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Lint valid examples with all three checks enabled (the default)
+      - name: Lint valid D2 files (format + validate + render)
+        uses: ./
+        with:
+          find_path: "examples/valid"
+          find_pattern: "*.d2"
+          verbose: "true"
+          fail_on_error: "true"
+
+      # Lint invalid examples — expect errors; continue-on-error allows the job
+      # to proceed so we can assert the step actually failed below.
+      - name: Lint invalid D2 files (expect errors)
+        id: lint-invalid
+        uses: ./
+        continue-on-error: true
+        with:
+          find_path: "examples/invalid"
+          find_pattern: "*.d2"
+          verbose: "true"
+          fail_on_error: "true"
+
+      # Assert the previous step reported failure — if the linter silently
+      # passed bad files this step will fail the job.
+      - name: Assert lint-invalid step failed
+        if: steps.lint-invalid.outcome != 'failure'
+        run: |
+          echo "Expected the lint-invalid step to fail, but it exited successfully." >&2
+          exit 1
+
+      # Demonstrate selective opt-out: validate + render only (no format check)
+      - name: Lint valid D2 files (validate + render only)
+        uses: ./
+        with:
+          find_path: "examples/valid"
+          find_pattern: "*.d2"
+          format: "false"
+          verbose: "true"
+          fail_on_error: "true"
+

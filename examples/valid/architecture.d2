@@ -1,0 +1,20 @@
+direction: right
+
+# A cloud architecture diagram
+internet -> load_balancer: HTTPS
+load_balancer -> web1: HTTP
+load_balancer -> web2: HTTP
+
+web1 -> cache: Redis
+web2 -> cache: Redis
+
+web1 -> app_db: SQL
+web2 -> app_db: SQL
+
+app_db -> replica: replication
+
+internet.shape: cloud
+load_balancer.shape: diamond
+cache.shape: cylinder
+app_db.shape: cylinder
+replica.shape: cylinder

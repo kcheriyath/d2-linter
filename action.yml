@@ -1,0 +1,47 @@
+name: "d2linter"
+description: "Lint your D2 declarative diagram files: format check, syntax validation, and render check"
+author: "kcheriyath"
+
+inputs:
+  file_list:
+    description: "(optional) Space or comma-delimited list of D2 files to lint. When set, find_path and find_pattern are ignored. Useful with actions that output changed-file lists."
+    required: false
+  find_path:
+    description: "(optional) Directory to search for D2 files, relative to the project root. Defaults to . (repository root)."
+    required: false
+    default: "."
+  find_pattern:
+    description: "(optional) Filename pattern to search for. Defaults to *.d2"
+    required: false
+    default: "*.d2"
+  format:
+    description: "(optional) Run d2 fmt --check to enforce canonical D2 formatting. Set to false to skip. Defaults to true."
+    required: false
+    default: "true"
+  validate:
+    description: "(optional) Run d2 validate to check syntax. Set to false to skip. Defaults to true."
+    required: false
+    default: "true"
+  render:
+    description: "(optional) Run d2 to verify each file renders without errors. Set to false to skip. Defaults to true."
+    required: false
+    default: "true"
+  extra_params:
+    description: "(optional) Extra flags forwarded to every d2 sub-command."
+    required: false
+  verbose:
+    description: "(optional) Set to false to reduce log output to errors only. Defaults to true."
+    required: false
+    default: "true"
+  fail_on_error:
+    description: "(optional) Whether the action should fail when lint errors are found. Defaults to true."
+    required: false
+    default: "true"
+
+branding:
+  icon: "check-square"
+  color: "blue"
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
