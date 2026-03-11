@@ -1,13 +1,15 @@
 # D2 Linter Action
 
-GitHub Action that lints [D2](https://d2lang.com) declarative diagram files using the official [d2](https://github.com/terrastruct/d2) formatter and parser.
+GitHub Action that lints [D2](https://d2lang.com) declarative diagram files using the official [d2](https://github.com/terrastruct/d2) toolchain.
 
-By default the action validates **syntax only** (no file modifications). Optionally it can enforce canonical D2 formatting.
+By default the action runs **all three checks** on every matching file: format, validate, and render. Each check can be individually disabled.
 
 ## Features
 
-- ✅ Validates D2 syntax — catches parse errors before they reach your diagrams
-- ✅ Optional formatting enforcement (`check_format: "true"`)
+- ✅ **Format check** — `d2 fmt --check` enforces canonical D2 formatting (never modifies workspace files)
+- ✅ **Syntax validation** — `d2 validate` catches parse errors
+- ✅ **Render check** — `d2 <file> /dev/null` verifies the diagram renders without errors
+- ✅ All three checks run by default; individually disable with `format=false`, `validate=false`, or `render=false`
 - ✅ Supports a static file list (e.g. only changed files) or path-based discovery
 - ✅ Configurable exit behaviour (`fail_on_error`)
 - ✅ Minimal Docker image (`debian:bookworm-slim`, non-root user, no extra packages)
@@ -15,7 +17,7 @@ By default the action validates **syntax only** (no file modifications). Optiona
 
 ## Usage
 
-### Lint all D2 files on every push
+### Lint all D2 files on every push (all checks)
 
 ```yaml
 on: [push, pull_request]
@@ -40,6 +42,24 @@ jobs:
           find_pattern: "*.d2"
 ```
 
+### Skip the format check (validate + render only)
+
+```yaml
+      - name: d2linter
+        uses: kcheriyath/d2-linter@v0.1.0
+        with:
+          format: "false"
+```
+
+### Skip the render check (format + validate only)
+
+```yaml
+      - name: d2linter
+        uses: kcheriyath/d2-linter@v0.1.0
+        with:
+          render: "false"
+```
+
 ### Lint only changed D2 files (with masesgroup/retrieve-changed-files)
 
 ```yaml
@@ -53,15 +73,6 @@ jobs:
         uses: kcheriyath/d2-linter@v0.1.0
         with:
           file_list: ${{ steps.changed_files.outputs.all }}
-```
-
-### Enforce canonical formatting as well as syntax
-
-```yaml
-      - name: d2linter
-        uses: kcheriyath/d2-linter@v0.1.0
-        with:
-          check_format: "true"
 ```
 
 ### Warn on errors but never fail the build
@@ -80,17 +91,20 @@ jobs:
 | `file_list` | No | — | Space/comma-delimited list of D2 files to lint. When set, `find_path` and `find_pattern` are ignored. |
 | `find_path` | No | `.` | Directory to search for D2 files, relative to the project root. |
 | `find_pattern` | No | `*.d2` | Filename pattern used with `find`. |
-| `check_format` | No | `false` | Set to `true` to also enforce D2 canonical formatting (`d2 fmt --check`). |
-| `extra_params` | No | — | Extra flags forwarded to `d2 fmt`. |
+| `format` | No | `true` | Run `d2 fmt --check` to enforce canonical formatting. Set to `false` to skip. |
+| `validate` | No | `true` | Run `d2 validate` to check syntax. Set to `false` to skip. |
+| `render` | No | `true` | Run `d2 <file> /dev/null` to verify rendering. Set to `false` to skip. |
+| `extra_params` | No | — | Extra flags forwarded to every d2 sub-command. |
 | `verbose` | No | `true` | Set to `false` to suppress informational output and only show errors. |
-| `fail_on_error` | No | `true` | Set to `false` to allow the action to pass even when lint errors are found. |
+| `fail_on_error` | No | `true` | Set to `false` to allow the action to pass even when errors are found. |
 
-## Lint modes
+## Checks explained
 
-| `check_format` | What is checked |
-|---|---|
-| `false` (default) | **Syntax only** — the file can be parsed without errors. File content is never modified. |
-| `true` | **Syntax + formatting** — equivalent to `d2 fmt --check`. Fails if the file is not in canonical D2 format. |
+| Check | Command | What it catches |
+|---|---|---|
+| `format` | `d2 fmt --check diagram.d2` | Files not in canonical D2 format. Never modifies workspace files. |
+| `validate` | `d2 validate diagram.d2` | Syntax / parse errors. |
+| `render` | `d2 diagram.d2 /dev/null` | Errors that only surface during rendering (layout, references, etc.). |
 
 ## Security
 

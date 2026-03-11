@@ -16,8 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Lint valid examples — must pass
-      - name: Lint valid D2 files (syntax check)
+      # Lint valid examples with all three checks enabled (the default)
+      - name: Lint valid D2 files (format + validate + render)
         uses: ./
         with:
           find_path: "examples/valid"
@@ -25,8 +25,8 @@ jobs:
           verbose: "true"
           fail_on_error: "true"
 
-      # Lint invalid examples — must surface errors; flip fail_on_error so
-      # the CI job itself still succeeds while exercising the error path
+      # Lint invalid examples — expect errors; fail_on_error=false so the
+      # CI job itself still passes while exercising all three error paths
       - name: Lint invalid D2 files (expect errors)
         uses: ./
         with:
@@ -35,14 +35,13 @@ jobs:
           verbose: "true"
           fail_on_error: "false"
 
-      # Exercise the format-check code path — not enforced as a hard failure
-      # here because canonical formatting is validated on developer machines
-      - name: Lint valid D2 files (format check, informational)
+      # Demonstrate selective opt-out: validate + render only (no format check)
+      - name: Lint valid D2 files (validate + render only)
         uses: ./
         with:
           find_path: "examples/valid"
           find_pattern: "*.d2"
-          check_format: "true"
+          format: "false"
           verbose: "true"
-          fail_on_error: "false"
+          fail_on_error: "true"
 

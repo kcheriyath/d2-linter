@@ -1,5 +1,5 @@
 name: "d2linter"
-description: "Lint your D2 declarative diagram files for syntax errors and optional formatting issues"
+description: "Lint your D2 declarative diagram files: format check, syntax validation, and render check"
 author: "kcheriyath"
 
 inputs:
@@ -14,12 +14,20 @@ inputs:
     description: "(optional) Filename pattern to search for. Defaults to *.d2"
     required: false
     default: "*.d2"
-  check_format:
-    description: "(optional) Set to true to also enforce D2 canonical formatting (d2 fmt --check). Defaults to false (syntax validation only)."
+  format:
+    description: "(optional) Run d2 fmt --check to enforce canonical D2 formatting. Set to false to skip. Defaults to true."
     required: false
-    default: "false"
+    default: "true"
+  validate:
+    description: "(optional) Run d2 validate to check syntax. Set to false to skip. Defaults to true."
+    required: false
+    default: "true"
+  render:
+    description: "(optional) Run d2 to verify each file renders without errors. Set to false to skip. Defaults to true."
+    required: false
+    default: "true"
   extra_params:
-    description: "(optional) Extra flags passed directly to the d2 fmt command."
+    description: "(optional) Extra flags forwarded to every d2 sub-command."
     required: false
   verbose:
     description: "(optional) Set to false to reduce log output to errors only. Defaults to true."
