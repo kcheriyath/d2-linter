@@ -110,7 +110,7 @@ jobs:
 
 This action is built with a minimal attack surface:
 
-- Base image is **`debian:bookworm-slim`** (pinned version, not `:latest`).
+- Base image is **`debian:bookworm-slim`**.
 - The d2 binary is downloaded with **SHA-256 checksum verification**.
 - The container runs as a **non-root user** (`linter`).
 - `curl` and other build-time tools are removed from the final image.
