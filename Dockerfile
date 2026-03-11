@@ -14,13 +14,22 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Download d2, verify checksum, extract binary, then clean up curl
-RUN D2_TAR="d2-v${D2_VERSION}-linux-amd64.tar.gz" \
+RUN set -e \
+    && arch="$(uname -m)" \
+    && case "$arch" in \
+         x86_64) d2_arch="amd64" ;; \
+         aarch64|arm64) d2_arch="arm64" ;; \
+         *) echo "Unsupported architecture: $arch" >&2; exit 1 ;; \
+       esac \
+    && D2_TAR="d2-v${D2_VERSION}-linux-${d2_arch}.tar.gz" \
     && curl -fsSL "https://github.com/terrastruct/d2/releases/download/v${D2_VERSION}/${D2_TAR}" \
          -o /tmp/d2.tar.gz \
-    && echo "eb172adf59f38d1e5a70ab177591356754ffaf9bebb84e0ca8b767dfb421dad7  /tmp/d2.tar.gz" | sha256sum -c \
+    && curl -fsSL "https://github.com/terrastruct/d2/releases/download/v${D2_VERSION}/${D2_TAR}.sha256" \
+         -o /tmp/d2.tar.gz.sha256 \
+    && sha256sum -c /tmp/d2.tar.gz.sha256 \
     && tar xz -C /tmp -f /tmp/d2.tar.gz \
     && find /tmp -path "*/bin/d2" -type f -exec install -m 0755 {} /usr/local/bin/d2 \; \
-    && rm -rf /tmp/d2.tar.gz /tmp/d2-* \
+    && rm -rf /tmp/d2.tar.gz /tmp/d2.tar.gz.sha256 /tmp/d2-* \
     && apt-get purge -y --auto-remove curl \
     && rm -rf /var/lib/apt/lists/*
 
