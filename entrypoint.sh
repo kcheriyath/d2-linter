@@ -38,7 +38,7 @@ else
     echo "==> Searching for '${INPUT_FIND_PATTERN}' files in '${INPUT_FIND_PATH}'." >&2
   fi
 
-  readarray -d '' FILELIST < <(find "${INPUT_FIND_PATH}" -name "${INPUT_FIND_PATTERN}" -print0)
+  readarray -d '' FILELIST < <(find -- "${INPUT_FIND_PATH}" -name "${INPUT_FIND_PATTERN}" -print0)
 
 fi
 
